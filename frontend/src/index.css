@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+button {
+  cursor: pointer;
+}
+
+@keyframes floatMascot {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float-robot {
+  animation: floatMascot 3.5s ease-in-out infinite;
+}

@@ -1,0 +1,200 @@
+{
+  "name": "Maily — AI-Powered Multilingual Email Intelligence & Action Agent Workflow",
+  "nodes": [
+    {
+      "id": "trigger_node",
+      "name": "On New Email / Scheduled Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "parameters": {
+        "trigger": "Every 15 Minutes / On User Sync Button"
+      }
+    },
+    {
+      "id": "gmail_fetch_node",
+      "name": "Gmail API Fetcher",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "parameters": {
+        "operation": "getAll",
+        "category": "primary",
+        "maxResults": 25,
+        "timezone": "Asia/Kolkata (IST)"
+      },
+      "credentials": {
+        "googleOAuth2": "Gmail OAuth2 Credentials"
+      }
+    },
+    {
+      "id": "llm_agent_node",
+      "name": "Maily AI Tool Agent",
+      "type": "langchain.agent",
+      "typeVersion": 1,
+      "position": [720, 300],
+      "parameters": {
+        "model": "Llama 3.2 / Ollama Local LLM / OpenAI",
+        "prompt": "Analyze email subject, sender, body. Extract concise summary, importance, category, actions, deadlines, and preferred language output (Tanglish/Tamil/English).",
+        "tools": [
+          "classify_email",
+          "extract_actions",
+          "extract_deadlines",
+          "generate_multilingual_summary",
+          "create_gmail_draft"
+        ]
+      }
+    },
+    {
+      "id": "importance_router",
+      "name": "Action & Importance Router",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [960, 300],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.importance == 'high' || $json.actions.length > 0}}",
+              "value2": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "must_read_action_node",
+      "name": "Add to Must-Read & Generate Draft Tool",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1200, 200],
+      "parameters": {
+        "action": "Flag High Priority, Extract Task, Prepare Suggested Reply Draft"
+      }
+    },
+    {
+      "id": "fyi_node",
+      "name": "Archive to Daily Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1200, 420],
+      "parameters": {
+        "action": "Group into Low Priority / FYI Digest"
+      }
+    },
+    {
+      "id": "postgres_db_node",
+      "name": "PostgreSQL Database Persistence",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1440, 300],
+      "parameters": {
+        "operation": "upsert",
+        "table": "emails, email_analyses, daily_digests, user_preferences"
+      }
+    },
+    {
+      "id": "react_ui_node",
+      "name": "Maily React Executive Briefing Dashboard",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [1680, 300],
+      "parameters": {
+        "path": "/api/digest/briefing",
+        "responseMode": "onReceived"
+      }
+    }
+  ],
+  "connections": {
+    "trigger_node": {
+      "main": [
+        [
+          {
+            "node": "gmail_fetch_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gmail_fetch_node": {
+      "main": [
+        [
+          {
+            "node": "llm_agent_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "llm_agent_node": {
+      "main": [
+        [
+          {
+            "node": "importance_router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "importance_router": {
+      "main": [
+        [
+          {
+            "node": "must_read_action_node",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "fyi_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "must_read_action_node": {
+      "main": [
+        [
+          {
+            "node": "postgres_db_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "fyi_node": {
+      "main": [
+        [
+          {
+            "node": "postgres_db_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "postgres_db_node": {
+      "main": [
+        [
+          {
+            "node": "react_ui_node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "instanceId": "maily_prod_v1"
+  }
+}

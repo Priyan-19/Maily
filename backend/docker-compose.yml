@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: maily-postgres
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: maily123
+      POSTGRES_DB: maily
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - maily_postgres_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
+volumes:
+  maily_postgres_data:

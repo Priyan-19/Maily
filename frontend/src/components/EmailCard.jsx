@@ -26,9 +26,11 @@ function EmailCard({ email }) {
                 />
             </div>
 
-            <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600 bg-slate-50/70 p-3 rounded-xl border border-slate-100">
-                {analysis?.summary || email.snippet || "Click to view full email and AI analysis."}
-            </p>
+            <div className="mt-3.5 rounded-xl bg-slate-50 border border-slate-200 p-3.5">
+                <p className="line-clamp-2 text-sm font-medium leading-relaxed text-slate-900">
+                    {analysis?.summary || email.snippet || "Click to view full email and AI analysis."}
+                </p>
+            </div>
 
             <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
                 <div className="flex items-center gap-2">

@@ -77,42 +77,32 @@ function EmailDetails() {
 
     return (
         <div className="max-w-4xl space-y-6">
-            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="flex items-start justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-900">{email.subject || "(No Subject)"}</h1>
-                        <p className="mt-2 text-sm text-slate-500">From: {email.sender}</p>
+            {analysis && (
+                <div className="rounded-2xl border border-indigo-200 bg-white p-6 shadow-xs space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl">⚡</span>
+                            <h2 className="text-lg font-bold text-slate-900">AI Intelligence Summary</h2>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                                {analysis.language}
+                            </span>
+                            <span className="rounded-lg bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                                {analysis.category}
+                            </span>
+                        </div>
                     </div>
 
-                    <PriorityBadge importance={analysis?.importance} />
-                </div>
-
-                <div className="mt-6 whitespace-pre-wrap text-sm leading-7 text-slate-700 border-t border-slate-100 pt-4">
-                    {email.body || email.snippet}
-                </div>
-            </div>
-
-            {analysis && (
-                <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-slate-900">AI Intelligence & Summary</h2>
-
-                    <p className="mt-4 text-slate-700 text-sm leading-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                        {analysis.summary}
-                    </p>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        <span className="rounded-md bg-indigo-50 text-indigo-700 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                            Language: {analysis.language}
-                        </span>
-
-                        <span className="rounded-md bg-slate-100 text-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                            Category: {analysis.category}
-                        </span>
+                    <div className="rounded-xl bg-slate-50/90 border border-slate-200 p-4">
+                        <p className="text-[15px] font-medium text-slate-900 leading-relaxed">
+                            {analysis.summary}
+                        </p>
                     </div>
 
                     {analysis.actions?.length > 0 && (
-                        <div className="mt-6">
-                            <h3 className="mb-3 font-semibold text-slate-900">Required Actions</h3>
+                        <div className="space-y-2 pt-2">
+                            <h3 className="text-xs font-bold text-indigo-700 uppercase tracking-wider">🎯 Required Actions:</h3>
                             <div className="space-y-2">
                                 {analysis.actions.map((action, index) => (
                                     <ActionCard key={index} action={action} />
@@ -122,19 +112,34 @@ function EmailDetails() {
                     )}
 
                     {analysis.deadlines?.length > 0 && (
-                        <div className="mt-6">
-                            <h3 className="mb-3 font-semibold text-slate-900">Deadlines</h3>
-                            <ul className="space-y-2 text-sm">
+                        <div className="space-y-2 pt-2">
+                            <h3 className="text-xs font-bold text-amber-700 uppercase tracking-wider">📅 Deadlines & Dates:</h3>
+                            <div className="flex flex-wrap gap-2">
                                 {analysis.deadlines.map((deadline, index) => (
-                                    <li key={index} className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-amber-800 font-medium">
-                                        Deadline: {deadline}
-                                    </li>
+                                    <span key={index} className="inline-flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-bold text-amber-900">
+                                        <span>⏰</span> {deadline}
+                                    </span>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
                     )}
                 </div>
             )}
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
+                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900">{email.subject || "(No Subject)"}</h1>
+                        <p className="mt-1.5 text-xs font-semibold text-slate-500">From: <span className="text-slate-700">{email.sender}</span></p>
+                    </div>
+
+                    <PriorityBadge importance={analysis?.importance} />
+                </div>
+
+                <div className="whitespace-pre-wrap text-sm leading-relaxed text-slate-800 bg-slate-50/50 p-5 rounded-xl border border-slate-200/60 font-sans">
+                    {(email.body || email.snippet || "").replace(/^>\s*/gm, '').replace(/\*/g, '')}
+                </div>
+            </div>
 
             {/* AI Action Agent: Draft Reply */}
             <div className="rounded-2xl border border-indigo-200 bg-indigo-50/40 p-6 shadow-sm">

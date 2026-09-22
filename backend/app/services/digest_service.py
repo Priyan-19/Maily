@@ -42,10 +42,12 @@ def generate_daily_digest(
 
     digest_emails = []
 
+    analyzed_count = 0
     for email in emails:
-        # If email isn't analyzed yet, auto-analyze it
-        if not email.analysis:
+        # If email isn't analyzed yet, auto-analyze up to 3 per request
+        if not email.analysis and analyzed_count < 3:
             try:
+                analyzed_count += 1
                 from app.services.analysis_service import analyze_and_save_email
                 analyze_and_save_email(db=db, email_id=email.id)
                 db.refresh(email)

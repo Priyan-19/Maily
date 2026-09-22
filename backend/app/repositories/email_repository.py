@@ -66,6 +66,11 @@ def save_email(
     is_read: bool,
 ) -> Email:
 
+    # Defensive formatting
+    sender = (sender or "")[:2000]
+    recipient = (recipient or "")[:4000]
+    subject = (subject or "")[:2000]
+
     existing_email = get_email_by_gmail_id(
         db=db,
         email_account_id=email_account_id,

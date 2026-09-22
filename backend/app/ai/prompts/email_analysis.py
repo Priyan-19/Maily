@@ -70,12 +70,13 @@ Deadline rules:
 Summary rules:
 
 - Write the summary in the requested target language ({target_language}).
-- If target_language is Tanglish, write in natural Tamil using English script (e.g. "Ungal interview nalaikku 10 AM-ku schedule...").
-- Keep the summary concise (2-3 sentences max).
-- Include the main purpose of the email.
-- Preserve important names, dates, times, and amounts.
-- Do not invent information.
-- Ignore unnecessary greetings and signatures.
+- If target_language is Tanglish, write in smooth, modern, natural conversational Tanglish (Tamil in English script). Avoid literal machine translations or awkward phrasing.
+- Make the summary extremely clear, executive-grade, and easy to read at a glance.
+- Keep it structured into 2 concise, high-impact statements:
+  1. Main Topic: What is the email about (sender, key subject, or notice).
+  2. Action / Bottom line: What the recipient needs to do or keep in mind.
+- Always preserve exact dates, times, amounts, links, job titles, or verification steps.
+- Do NOT include filler greetings, signatures, or legal disclaimers.
 
 Language rules:
 

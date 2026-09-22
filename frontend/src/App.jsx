@@ -58,28 +58,30 @@ function Layout() {
   const activeNav = navigation.find((n) => location.pathname === n.path) || navigation[0]
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-800 antialiased">
-      <div className="flex min-h-screen">
-        {/* Sleek Sidebar */}
-        <aside className="hidden w-64 border-r border-slate-200/80 bg-white md:flex md:flex-col justify-between">
-          <div>
-            <div className="px-6 py-6 flex items-center gap-3 border-b border-slate-100">
+    <div className="min-h-screen bg-slate-50/50 font-sans text-slate-800 antialiased flex flex-col">
+      {/* Top Navbar */}
+      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between gap-4">
+            {/* Left: Brand Logo & Title */}
+            <Link to="/" className="flex items-center gap-3 group">
               <img
                 src="/robot.png"
-                alt="Maily AI Mascot"
-                className="h-10 w-10 object-contain drop-shadow-sm"
+                alt="Maily Mascot"
+                className="h-9 w-9 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
               />
               <div>
-                <h1 className="text-lg font-bold tracking-tight text-slate-900">
+                <h1 className="text-lg font-bold tracking-tight text-slate-900 leading-tight">
                   Maily
                 </h1>
-                <p className="text-xs font-semibold text-indigo-600">
-                  AI Intelligence Agent
+                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
+                  AI Agent
                 </p>
               </div>
-            </div>
+            </Link>
 
-            <nav className="p-4 space-y-1">
+            {/* Center: Horizontal Navigation Bar */}
+            <nav className="flex items-center gap-1 sm:gap-2">
               {navigation.map((item) => {
                 const active = location.pathname === item.path
 
@@ -87,79 +89,51 @@ function Layout() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                    className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-semibold transition-all duration-200 ${
                       active
-                        ? "bg-indigo-50 text-indigo-700 shadow-sm"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-indigo-50 text-indigo-700 shadow-2xs border border-indigo-100"
+                        : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                     }`}
                   >
                     <span className={active ? "text-indigo-600" : "text-slate-400"}>
                       {item.icon}
                     </span>
-                    {item.name}
+                    <span className="hidden sm:inline">{item.name}</span>
                   </Link>
                 )
               })}
             </nav>
-          </div>
 
-          <div className="p-4 border-t border-slate-100">
-            <div className="rounded-xl bg-gradient-to-r from-slate-900 to-indigo-950 p-4 text-white flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-indigo-300">
-                  Status
-                </p>
-                <p className="mt-1 text-xs font-medium text-slate-100">
-                  Gmail Primary Connected
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-xs text-slate-300">Live AI Monitoring</span>
-                </div>
+            {/* Right: Status Badges & Profile */}
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold text-emerald-800">Gmail Connected</span>
               </div>
-              <img
-                src="/robot.png"
-                alt="AI Robot Assistant"
-                className="h-12 w-12 object-contain animate-float-robot"
-              />
-            </div>
-          </div>
-        </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur-md px-6 py-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold tracking-tight text-slate-900">
-                {activeNav.name}
-              </h2>
+              <div className="flex items-center gap-2 bg-indigo-50/80 border border-indigo-100/80 rounded-full px-3 py-1 shadow-2xs">
+                <img src="/robot.png" alt="Robot AI" className="h-5 w-5 object-contain" />
+                <span className="text-xs font-semibold text-indigo-700 hidden md:inline">Robot AI Online</span>
+              </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-indigo-50/80 border border-indigo-100/80 rounded-full px-3 py-1 shadow-xs">
-                  <img src="/robot.png" alt="Robot AI" className="h-6 w-6 object-contain" />
-                  <span className="text-xs font-semibold text-indigo-700">Robot AI Online</span>
-                </div>
-                <span className="hidden sm:inline-block text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
-                  IST (UTC+5:30)
-                </span>
-                <div className="h-9 w-9 rounded-full bg-indigo-600 font-bold text-sm flex items-center justify-center text-white shadow-md shadow-indigo-100">
-                  P
-                </div>
+              <div className="h-8 w-8 rounded-full bg-indigo-600 font-bold text-xs flex items-center justify-center text-white shadow-md shadow-indigo-100">
+                P
               </div>
             </div>
-          </header>
-
-          <div className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/emails" element={<Emails />} />
-              <Route path="/emails/:id" element={<EmailDetails />} />
-              <Route path="/actions" element={<Actions />} />
-              <Route path="/settings" element={<Settings />} />
-            </Routes>
           </div>
-        </main>
-      </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl w-full mx-auto">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/emails" element={<Emails />} />
+          <Route path="/emails/:id" element={<EmailDetails />} />
+          <Route path="/actions" element={<Actions />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </main>
     </div>
   )
 }

@@ -114,8 +114,10 @@ def list_messages(
         "maxResults": max_results,
     }
 
-    if query:
-        request_params["q"] = query
+    if not query:
+        query = "category:primary -category:promotions -category:social"
+
+    request_params["q"] = query
 
     response = (
         gmail.users()

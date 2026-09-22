@@ -171,14 +171,20 @@ def get_executive_briefing(
 
     from app.services.analysis_service import analyze_and_save_email
 
+    unanalyzed_count = 0
     for email in recent_emails:
         analysis = email.analysis
-        if not analysis:
+        if not analysis and unanalyzed_count < 3:
             try:
+                unanalyzed_count += 1
                 analysis = analyze_and_save_email(db=db, email_id=email.id)
                 db.refresh(email)
             except Exception as e:
                 print(f"Failed analysis for email {email.id}: {e}")
+
+        # Skip promotional / marketing and social emails
+        if analysis and analysis.category in ("marketing", "social"):
+            continue
 
         item = {
             "id": email.id,

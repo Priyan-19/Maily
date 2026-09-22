@@ -16,14 +16,18 @@ function Dashboard() {
     const loadData = async () => {
         try {
             setLoading(true)
-            const [digestData, briefingData] = await Promise.all([
+            const [digestRes, briefingRes] = await Promise.allSettled([
                 getTodayDigest(),
                 getBriefing(),
             ])
-            setDigest(digestData)
-            setBriefing(briefingData)
+            if (digestRes.status === "fulfilled" && digestRes.value) {
+                setDigest(digestRes.value)
+            }
+            if (briefingRes.status === "fulfilled" && briefingRes.value) {
+                setBriefing(briefingRes.value)
+            }
         } catch (err) {
-            console.error(err)
+            console.error("Dashboard loadData error:", err)
         } finally {
             setLoading(false)
         }
@@ -65,6 +69,23 @@ function Dashboard() {
         }
     }
 
+    const loadDataSilent = async () => {
+        try {
+            const [digestRes, briefingRes] = await Promise.allSettled([
+                getTodayDigest(),
+                getBriefing(),
+            ])
+            if (digestRes.status === "fulfilled" && digestRes.value) {
+                setDigest(digestRes.value)
+            }
+            if (briefingRes.status === "fulfilled" && briefingRes.value) {
+                setBriefing(briefingRes.value)
+            }
+        } catch (err) {
+            console.error("Silent background refresh error:", err)
+        }
+    }
+
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search)
         if (queryParams.get("auth") === "success") {
@@ -74,6 +95,13 @@ function Dashboard() {
         } else {
             loadData()
         }
+
+        // Silent background sync every 40 seconds
+        const timer = setInterval(() => {
+            loadDataSilent()
+        }, 40000)
+
+        return () => clearInterval(timer)
     }, [])
 
     if (loading && !digest) {
@@ -239,34 +267,52 @@ function Dashboard() {
                 <div className="space-y-4">
                     {briefing?.must_read_emails?.length > 0 ? (
                         briefing.must_read_emails.map((item) => (
-                            <div key={item.id} className="rounded-2xl border border-red-200/80 bg-red-50/20 p-5 shadow-sm hover:border-red-300 transition">
-                                <div className="flex items-start justify-between gap-4">
+                            <div key={item.id} className="rounded-2xl border border-red-200 bg-white p-5 shadow-xs hover:shadow-md transition space-y-4">
+                                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
                                     <div>
-                                        <Link to={`/emails/${item.id}`} className="font-bold text-slate-900 hover:text-indigo-600 text-base">
+                                        <Link to={`/emails/${item.id}`} className="font-bold text-slate-900 hover:text-indigo-600 text-lg leading-snug">
                                             {item.subject}
                                         </Link>
-                                        <p className="text-xs text-slate-500 mt-1">{item.sender}</p>
+                                        <p className="text-xs font-semibold text-slate-500 mt-1">{item.sender}</p>
                                     </div>
 
-                                    <span className="rounded-md bg-red-100 text-red-700 px-2.5 py-1 text-xs font-extrabold uppercase">
+                                    <span className="rounded-lg bg-red-100 text-red-800 border border-red-200 px-3 py-1 text-xs font-extrabold uppercase tracking-wide flex-shrink-0">
                                         Action Required
                                     </span>
                                 </div>
 
-                                <p className="mt-3 text-sm text-slate-700 leading-6 bg-white p-3 rounded-xl border border-slate-200/60">
-                                    {item.summary}
-                                </p>
+                                <div className="rounded-xl bg-slate-50/80 border border-slate-200 p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-600">
+                                        <span>⚡ AI Executive Summary</span>
+                                    </div>
+                                    <p className="text-[15px] font-medium text-slate-900 leading-relaxed">
+                                        {item.summary}
+                                    </p>
+                                </div>
 
                                 {item.actions?.length > 0 && (
-                                    <div className="mt-3">
-                                        <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Actions to Take:</p>
-                                        <ul className="text-xs font-medium text-slate-700 space-y-1">
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-bold text-indigo-700 uppercase tracking-wider">🎯 Actions to Take:</p>
+                                        <div className="flex flex-wrap gap-2">
                                             {item.actions.map((act, i) => (
-                                                <li key={i} className="flex items-center gap-1.5">
-                                                    <span className="text-indigo-600">✓</span> {act}
-                                                </li>
+                                                <span key={i} className="inline-flex items-center gap-2 rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-900">
+                                                    <span className="text-indigo-600 font-bold">✓</span> {act}
+                                                </span>
                                             ))}
-                                        </ul>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {item.deadlines?.length > 0 && (
+                                    <div className="space-y-2">
+                                        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">📅 Deadlines & Dates:</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {item.deadlines.map((dl, i) => (
+                                                <span key={i} className="inline-flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-1.5 text-xs font-bold text-amber-900">
+                                                    <span>⏰</span> {dl}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -284,23 +330,28 @@ function Dashboard() {
                 <div className="space-y-4">
                     {briefing?.unread_emails?.length > 0 ? (
                         briefing.unread_emails.map((item) => (
-                            <div key={item.id} className="rounded-2xl border border-amber-200/80 bg-amber-50/20 p-5 shadow-sm hover:border-amber-300 transition">
-                                <div className="flex items-start justify-between gap-4">
+                            <div key={item.id} className="rounded-2xl border border-amber-200 bg-white p-5 shadow-xs hover:shadow-md transition space-y-4">
+                                <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
                                     <div>
-                                        <Link to={`/emails/${item.id}`} className="font-bold text-slate-900 hover:text-indigo-600 text-base">
+                                        <Link to={`/emails/${item.id}`} className="font-bold text-slate-900 hover:text-indigo-600 text-lg leading-snug">
                                             {item.subject}
                                         </Link>
-                                        <p className="text-xs text-slate-500 mt-1">{item.sender}</p>
+                                        <p className="text-xs font-semibold text-slate-500 mt-1">{item.sender}</p>
                                     </div>
 
-                                    <span className="rounded-md bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-bold uppercase">
+                                    <span className="rounded-lg bg-amber-100 text-amber-900 border border-amber-200 px-3 py-1 text-xs font-extrabold uppercase">
                                         Unread
                                     </span>
                                 </div>
 
-                                <p className="mt-3 text-sm text-slate-700 leading-6">
-                                    {item.summary || item.snippet}
-                                </p>
+                                <div className="rounded-xl bg-slate-50/80 border border-slate-200 p-4 space-y-2">
+                                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700">
+                                        <span>📝 Overview & Context</span>
+                                    </div>
+                                    <p className="text-[15px] font-medium text-slate-900 leading-relaxed">
+                                        {item.summary || item.snippet}
+                                    </p>
+                                </div>
                             </div>
                         ))
                     ) : (
@@ -315,22 +366,24 @@ function Dashboard() {
             {activeTab === "last20" && (
                 <div className="space-y-4">
                     {briefing?.last_20_emails?.map((item) => (
-                        <div key={item.id} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm hover:border-indigo-200 transition">
-                            <div className="flex items-start justify-between gap-4">
+                        <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs hover:border-indigo-200 transition space-y-3">
+                            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3">
                                 <div>
                                     <Link to={`/emails/${item.id}`} className="font-bold text-slate-900 hover:text-indigo-600 text-base">
                                         {item.subject}
                                     </Link>
-                                    <p className="text-xs text-slate-500 mt-1">{item.sender}</p>
+                                    <p className="text-xs font-semibold text-slate-500 mt-1">{item.sender}</p>
                                 </div>
-                                <span className="text-xs font-medium text-slate-400">
+                                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                                     {item.received_at ? new Date(item.received_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                                 </span>
                             </div>
 
-                            <p className="mt-3 text-sm text-slate-600 leading-6 bg-slate-50/60 p-3 rounded-xl border border-slate-100">
-                                {item.summary}
-                            </p>
+                            <div className="rounded-xl bg-slate-50/80 border border-slate-200 p-3.5">
+                                <p className="text-sm font-medium text-slate-800 leading-relaxed">
+                                    {item.summary}
+                                </p>
+                            </div>
                         </div>
                     ))}
                 </div>

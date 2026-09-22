@@ -28,14 +28,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - APP_NAME=Maily API
-      - DEBUG=true
       - DATABASE_URL=postgresql+psycopg://postgres:maily123@db:5432/maily
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/auth/google/callback}
-      - GOOGLE_SCOPES=${GOOGLE_SCOPES:-https://www.googleapis.com/auth/gmail.readonly}
-      - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       db:
         condition: service_healthy

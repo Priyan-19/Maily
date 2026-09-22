@@ -20,8 +20,12 @@ def sync_gmail_emails(
     saved_emails = []
 
     for email in emails:
+        labels = email.labels or []
+        # Skip promotional and social emails
+        if "CATEGORY_PROMOTIONS" in labels or "CATEGORY_SOCIAL" in labels:
+            continue
 
-        is_read = "UNREAD" not in email.labels
+        is_read = "UNREAD" not in labels
 
         saved_email = save_email(
             db=db,

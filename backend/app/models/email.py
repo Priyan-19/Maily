@@ -40,17 +40,17 @@ class Email(Base):
     )
 
     sender: Mapped[str] = mapped_column(
-        String(500),
+        Text,
         default="",
     )
 
     recipient: Mapped[str] = mapped_column(
-        String(500),
+        Text,
         default="",
     )
 
     subject: Mapped[str] = mapped_column(
-        String(1000),
+        Text,
         default="",
     )
 

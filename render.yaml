@@ -1,16 +1,8 @@
 services:
-  # Managed PostgreSQL Database
-  - type: postgres
-    name: maily-db
-    databaseName: maily
-    user: postgres
-    plan: free
-    ipAllowList: []
-
   # FastAPI Python Backend Container
   - type: web
     name: maily-backend
-    env: docker
+    runtime: docker
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     plan: free
@@ -31,7 +23,14 @@ services:
   # React Frontend Container
   - type: web
     name: maily-frontend
-    env: docker
+    runtime: docker
     dockerContext: ./frontend
     dockerfilePath: ./frontend/Dockerfile
+    plan: free
+
+databases:
+  # Managed PostgreSQL Database
+  - name: maily-db
+    databaseName: maily
+    user: postgres
     plan: free

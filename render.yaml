@@ -32,5 +32,4 @@ databases:
   # Managed PostgreSQL Database
   - name: maily-db
     databaseName: maily
-    user: postgres
     plan: free
